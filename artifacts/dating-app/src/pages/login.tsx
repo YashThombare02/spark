@@ -4,7 +4,7 @@ import { useLogin, useRegister, useGetDemoCredentials, getGetMeQueryKey } from "
 import { useQueryClient } from "@tanstack/react-query";
 import { Flame, Mail, Camera, Copy, ChevronLeft, Loader2, LogIn, UserPlus } from "lucide-react";
 import { toast } from "sonner";
-import { DemoCredential } from "@workspace/api-client-react/src/generated/api.schemas";
+import { DemoCredential } from "@workspace/api-client-react";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -35,7 +35,7 @@ export default function Login() {
         queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
         setLocation(flow === "login" ? "/" : "/onboarding");
       },
-      onError: (err) => {
+      onError: (err: any) => {
         toast.error(flow === "login" ? "Login failed" : "Registration failed", {
           description: err.data?.error || "An error occurred"
         });

@@ -10,7 +10,7 @@ import {
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { X, Star, Heart, BadgeCheck, MapPin, Sparkles, Loader2, Flame } from "lucide-react";
-import { User, SwipeResult } from "@workspace/api-client-react/src/generated/api.schemas";
+import { User, SwipeResult } from "@workspace/api-client-react";
 
 // Match Modal Component
 function MatchModal({ matchedUser, onClose }: { matchedUser: User, onClose: () => void }) {
@@ -240,7 +240,6 @@ function Card({
     <motion.div
       style={{
         x: isFront ? x : 0,
-        y: isFront ? y : 0,
         rotate: isFront ? rotate : 0,
         scale: isFront ? 1 : 0.95,
         y: isFront ? y : 15,
@@ -308,7 +307,7 @@ function Card({
         </div>
         
         <div className="flex flex-wrap gap-2 mb-3">
-          {user.interests.slice(0, 3).map((interest, i) => (
+          {user.interests.slice(0, 3).map((interest: string, i: number) => (
             <span key={i} className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-medium border border-white/10 text-white">
               {interest}
             </span>
