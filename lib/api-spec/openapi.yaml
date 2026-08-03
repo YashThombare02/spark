@@ -3,20 +3,28 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Spark Dating App API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: users
+    description: User profile operations
+  - name: swipes
+    description: Swipe actions
+  - name: likes
+    description: Likes and matches
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +32,388 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Demo login with Gmail or Instagram credentials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginCredentials"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResult"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout current session
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/me/update:
+    patch:
+      operationId: updateMe
+      tags: [users]
+      summary: Update current user profile fields
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/discover:
+    get:
+      operationId: discoverUsers
+      tags: [users]
+      summary: Get profiles to swipe on, filtered by the user's gender preference
+      parameters:
+        - name: minAge
+          in: query
+          schema:
+            type: number
+        - name: maxAge
+          in: query
+          schema:
+            type: number
+        - name: city
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of profiles to discover
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/stats:
+    get:
+      operationId: getUserStats
+      tags: [users]
+      summary: Get stats for current user (likes sent, matches, etc.)
+      responses:
+        "200":
+          description: User stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStats"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /swipes:
+    post:
+      operationId: recordSwipe
+      tags: [swipes]
+      summary: Record a like, pass, or super-like swipe action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SwipeAction"
+      responses:
+        "200":
+          description: Swipe recorded, match status returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SwipeResult"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /likes:
+    get:
+      operationId: getLikes
+      tags: [likes]
+      summary: Get profiles the current user has liked
+      responses:
+        "200":
+          description: List of liked profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /matches:
+    get:
+      operationId: getMatches
+      tags: [likes]
+      summary: Get mutual matches for current user
+      responses:
+        "200":
+          description: List of matched profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Match"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /demo-credentials:
+    get:
+      operationId: getDemoCredentials
+      tags: [auth]
+      summary: Get all demo credentials for the login screen
+      responses:
+        "200":
+          description: Demo credentials list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoCredentialsList"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    SuccessResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+
+    LoginCredentials:
+      type: object
+      required: [loginType, usernameOrEmail, password]
+      properties:
+        loginType:
+          type: string
+          enum: [gmail, instagram]
+        usernameOrEmail:
+          type: string
+        password:
+          type: string
+
+    AuthResult:
+      type: object
+      required: [user, token]
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+
+    User:
+      type: object
+      required: [id, fullName, gender, interestedIn, age, city, bio, profileImage, loginType, usernameOrEmail, interests, verified, isOnline]
+      properties:
+        id:
+          type: number
+        fullName:
+          type: string
+        gender:
+          type: string
+          enum: [Male, Female]
+        interestedIn:
+          type: string
+          enum: [Male, Female]
+        age:
+          type: number
+        city:
+          type: string
+        bio:
+          type: string
+        profileImage:
+          type: string
+        loginType:
+          type: string
+          enum: [gmail, instagram]
+        usernameOrEmail:
+          type: string
+        interests:
+          type: array
+          items:
+            type: string
+        verified:
+          type: boolean
+        isOnline:
+          type: boolean
+
+    UserUpdate:
+      type: object
+      properties:
+        bio:
+          type: string
+        city:
+          type: string
+        interests:
+          type: array
+          items:
+            type: string
+
+    UserStats:
+      type: object
+      required: [likesSent, likesReceived, matches, superLikes, profileViews]
+      properties:
+        likesSent:
+          type: number
+        likesReceived:
+          type: number
+        matches:
+          type: number
+        superLikes:
+          type: number
+        profileViews:
+          type: number
+
+    SwipeAction:
+      type: object
+      required: [targetUserId, action]
+      properties:
+        targetUserId:
+          type: number
+        action:
+          type: string
+          enum: [like, pass, superlike]
+
+    SwipeResult:
+      type: object
+      required: [isMatch, action]
+      properties:
+        isMatch:
+          type: boolean
+        action:
+          type: string
+          enum: [like, pass, superlike]
+        matchedUser:
+          $ref: "#/components/schemas/User"
+
+    Match:
+      type: object
+      required: [id, matchedAt, user]
+      properties:
+        id:
+          type: number
+        matchedAt:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/User"
+
+    DemoCredential:
+      type: object
+      required: [loginType, usernameOrEmail, password, fullName, profileImage]
+      properties:
+        loginType:
+          type: string
+          enum: [gmail, instagram]
+        usernameOrEmail:
+          type: string
+        password:
+          type: string
+        fullName:
+          type: string
+        profileImage:
+          type: string
+
+    DemoCredentialsList:
+      type: object
+      required: [gmail, instagram]
+      properties:
+        gmail:
+          type: array
+          items:
+            $ref: "#/components/schemas/DemoCredential"
+        instagram:
+          type: array
+          items:
+            $ref: "#/components/schemas/DemoCredential"

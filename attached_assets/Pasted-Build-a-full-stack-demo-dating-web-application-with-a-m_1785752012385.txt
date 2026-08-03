@@ -1,0 +1,196 @@
+Build a full-stack demo dating web application with a modern UI inspired by Bumble and Hinge (do not copy their branding, logos, or exact design). The app is for demo/testing purposes only.
+
+Tech Stack
+Frontend: React + Vite + Tailwind CSS
+Backend: Node.js + Express
+Database: SQLite (or PostgreSQL if easier on Replit)
+Authentication: Demo authentication only (no real Google or Instagram OAuth)
+Features
+1. Login Page
+
+Create a beautiful modern login page with:
+
+App logo at the top
+Clean gradient background
+Two login buttons:
+Login with Gmail
+Login with Instagram
+Below the buttons, show demo credentials that users can use for testing.
+Since this is a demo app, do not implement real Google or Instagram login. Instead, simulate these login methods by validating against demo accounts stored in the database.
+2. Demo Database
+
+Create a database table named users.
+
+Fields:
+
+id
+fullName
+gender (Male/Female)
+interestedIn (Male/Female)
+age
+city
+bio
+profileImage
+loginType (gmail/instagram)
+usernameOrEmail
+password
+interests
+verified
+
+Insert 12 demo users:
+
+6 males
+6 females
+
+Each profile should have:
+
+Realistic names
+Age
+Bio
+City
+4–6 interests
+Attractive royalty-free placeholder profile images (e.g. from Unsplash, Pexels, or generated avatars)
+Verification badge on some users
+
+Create demo credentials like:
+
+Gmail Accounts
+emma@gmail.com / Demo123
+sophia@gmail.com / Demo123
+olivia@gmail.com / Demo123
+james@gmail.com / Demo123
+ethan@gmail.com / Demo123
+noah@gmail.com / Demo123
+Instagram Accounts
+@emma_life / Insta123
+@sophia.xx / Insta123
+@olivia_21 / Insta123
+@james.fit / Insta123
+@ethan_official / Insta123
+@noah_07 / Insta123
+
+Store these credentials in the database and authenticate against them.
+
+3. Matching Logic
+
+When a user logs in:
+
+If gender == Male
+→ Show only Female profiles.
+
+If gender == Female
+→ Show only Male profiles.
+
+Never show the user's own profile.
+
+4. Home Screen
+
+Create a clean swipe-style interface inspired by modern dating apps.
+
+Each profile card should include:
+
+Large profile image
+Name
+Age
+City
+Short bio
+Interests displayed as chips
+Verified badge (if applicable)
+
+Buttons:
+
+❤️ Like
+❌ Pass
+⭐ Super Like
+
+Animate transitions smoothly.
+
+5. Bottom Navigation
+
+Include:
+
+Home
+Likes
+Matches
+Profile
+6. Likes Page
+
+Display:
+
+Profiles the current user has liked
+Empty state if none
+7. Matches Page
+
+Since this is a demo:
+
+Automatically create a match if both users "like" each other (or simulate mutual matches).
+Show a list of matches.
+8. Profile Page
+
+Display:
+
+Profile picture
+Name
+Age
+Bio
+Interests
+City
+Gender
+Interested In
+Login Type
+Logout button
+9. UI Design
+
+Create a premium-looking interface with:
+
+Rounded cards
+Soft shadows
+Modern typography
+Smooth animations
+Mobile-first responsive layout
+Light color palette with pink/purple gradient accents
+Clean spacing
+Glassmorphism where appropriate
+
+Do not use copyrighted Bumble or Hinge branding or assets. Create an original design with a similar clean, modern aesthetic.
+
+10. Database Seed
+
+On first run:
+
+Automatically create all demo users.
+Seed the database if it is empty.
+11. Validation
+Invalid credentials → show "Invalid username/email or password."
+Successful login → redirect to Home.
+Persist login using local storage or session.
+12. Project Structure
+
+Organize code into:
+
+frontend/
+backend/
+database/
+components/
+pages/
+routes/
+models/
+seed/
+assets/
+
+Keep the code clean, modular, and well-commented.
+
+13. Extra Polish
+
+Add:
+
+Loading animations
+Hover effects
+Card transition animations
+Toast notifications
+Skeleton loaders
+Responsive mobile layout
+Dark mode toggle
+Search/filter by age and city
+"Online now" indicator for some demo users
+Settings page with editable profile fields (stored locally)
