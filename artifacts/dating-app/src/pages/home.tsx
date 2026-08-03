@@ -87,7 +87,7 @@ export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [matchResult, setMatchResult] = useState<SwipeResult | null>(null);
 
-  const activeUsers = users.slice(currentIndex);
+  const activeUsers = Array.isArray(users) ? users.slice(currentIndex) : [];
   
   const handleSwipe = async (userId: number, action: 'like' | 'pass' | 'superlike') => {
     setCurrentIndex(prev => prev + 1);

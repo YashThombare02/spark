@@ -56,5 +56,50 @@ router.post("/auth/logout", async (req, res): Promise<void> => {
   });
 });
 
+router.post("/auth/register", async (req, res): Promise<void> => {
+  const parsed = LoginBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const { loginType, usernameOrEmail, password } = parsed.data;
+
+  // Check if user already exists
+  const [existingUser] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.usernameOrEmail, usernameOrEmail));
+
+  if (existingUser) {
+    res.status(400).json({ error: "Username or email already exists." });
+    return;
+  }
+
+  // Insert dummy data for required fields
+  const [newUser] = await db
+    .insert(usersTable)
+    .values({
+      loginType,
+      usernameOrEmail,
+      password,
+      fullName: usernameOrEmail.split('@')[0], // dummy name
+      gender: "Male",
+      interestedIn: "Female",
+      age: 25,
+      city: "San Francisco",
+      bio: "Hello, I'm new here!",
+      profileImage: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80",
+    })
+    .returning();
+
+  req.session.userId = newUser.id;
+
+  res.json({
+    user: userToResponse(newUser),
+    token: `session-${newUser.id}`,
+  });
+});
+
 export { userToResponse };
 export default router;

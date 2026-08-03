@@ -13,6 +13,7 @@ import Likes from '@/pages/likes';
 import Matches from '@/pages/matches';
 import Profile from '@/pages/profile';
 import Settings from '@/pages/settings';
+import Onboarding from '@/pages/onboarding';
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
+      <Route path="/onboarding" component={Onboarding} />
       <Route component={ProtectedRoutes} />
     </Switch>
   );

@@ -46,6 +46,35 @@ export const LoginResponse = zod.object({
 
 
 /**
+ * @summary Register a new account
+ */
+export const RegisterBody = zod.object({
+  "loginType": zod.enum(['gmail', 'instagram']),
+  "usernameOrEmail": zod.string(),
+  "password": zod.string()
+})
+
+export const RegisterResponse = zod.object({
+  "user": zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "gender": zod.enum(['Male', 'Female']),
+  "interestedIn": zod.enum(['Male', 'Female']),
+  "age": zod.number(),
+  "city": zod.string(),
+  "bio": zod.string(),
+  "profileImage": zod.string(),
+  "loginType": zod.enum(['gmail', 'instagram']),
+  "usernameOrEmail": zod.string(),
+  "interests": zod.array(zod.string()),
+  "verified": zod.boolean(),
+  "isOnline": zod.boolean()
+}),
+  "token": zod.string()
+})
+
+
+/**
  * @summary Logout current session
  */
 export const LogoutResponse = zod.object({

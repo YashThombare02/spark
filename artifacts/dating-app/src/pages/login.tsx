@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { useLogin, useGetDemoCredentials, getGetMeQueryKey } from "@workspace/api-client-react";
+import { useLogin, useRegister, useGetDemoCredentials, getGetMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Flame, Mail, Camera, Copy, CheckCircle2, ChevronLeft, Loader2 } from "lucide-react";
+import { Flame, Mail, Camera, Copy, ChevronLeft, Loader2, LogIn, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { DemoCredential } from "@workspace/api-client-react/src/generated/api.schemas";
 
@@ -10,31 +10,34 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   
-  const [loginType, setLoginType] = useState<"gmail" | "instagram" | null>(null);
+  const [flow, setFlow] = useState<"login" | "register" | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   
   const { data: credentialsData } = useGetDemoCredentials();
   const loginMutation = useLogin();
+  const registerMutation = useRegister();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!loginType) return;
+    if (!flow) return;
     
-    loginMutation.mutate({
+    const action = flow === "login" ? loginMutation : registerMutation;
+
+    action.mutate({
       data: {
-        loginType,
+        loginType: "gmail", // default for new logic
         usernameOrEmail: username,
         password
       }
     }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
-        setLocation("/");
+        setLocation(flow === "login" ? "/" : "/onboarding");
       },
       onError: (err) => {
-        toast.error("Login failed", {
-          description: err.data?.error || "Invalid credentials"
+        toast.error(flow === "login" ? "Login failed" : "Registration failed", {
+          description: err.data?.error || "An error occurred"
         });
       }
     });
@@ -62,21 +65,21 @@ export default function Login() {
           <p className="text-muted-foreground mt-2 text-center">Find the one who matches your energy.</p>
         </div>
 
-        {!loginType ? (
+        {!flow ? (
           <div className="w-full flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <button
-              onClick={() => setLoginType("gmail")}
+              onClick={() => setFlow("login")}
               className="w-full h-14 bg-white dark:bg-zinc-900 border border-border rounded-xl flex items-center justify-center gap-3 font-semibold text-[15px] hover:border-primary/50 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all active:scale-[0.98]"
             >
-              <Mail className="w-5 h-5 text-red-500" />
-              Continue with Gmail
+              <LogIn className="w-5 h-5 text-primary" />
+              Sign In
             </button>
             <button
-              onClick={() => setLoginType("instagram")}
+              onClick={() => setFlow("register")}
               className="w-full h-14 bg-white dark:bg-zinc-900 border border-border rounded-xl flex items-center justify-center gap-3 font-semibold text-[15px] hover:border-primary/50 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all active:scale-[0.98]"
             >
-              <Camera className="w-5 h-5 text-pink-500" />
-              Continue with Instagram
+              <UserPlus className="w-5 h-5 text-primary" />
+              Create New Account
             </button>
 
             {credentialsData && (
@@ -117,17 +120,17 @@ export default function Login() {
         ) : (
           <div className="w-full animate-in fade-in slide-in-from-right-4 duration-300">
             <button 
-              onClick={() => setLoginType(null)}
+              onClick={() => setFlow(null)}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
               Back
             </button>
             
-            <form onSubmit={handleLogin} className="flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="flex items-center justify-center gap-2 mb-4">
-                {loginType === "gmail" ? <Mail className="w-5 h-5 text-red-500" /> : <Camera className="w-5 h-5 text-pink-500" />}
-                <span className="font-semibold capitalize text-sm">Login with {loginType}</span>
+                {flow === "login" ? <LogIn className="w-5 h-5 text-primary" /> : <UserPlus className="w-5 h-5 text-primary" />}
+                <span className="font-semibold capitalize text-sm">{flow === "login" ? "Sign In" : "Create New Account"}</span>
               </div>
               
               <div className="space-y-4">
@@ -157,10 +160,10 @@ export default function Login() {
 
               <button
                 type="submit"
-                disabled={loginMutation.isPending}
+                disabled={loginMutation.isPending || registerMutation.isPending}
                 className="w-full h-14 mt-4 brand-gradient rounded-xl text-white font-bold text-[15px] shadow-lg shadow-primary/30 flex items-center justify-center transition-all active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100"
               >
-                {loginMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
+                {(loginMutation.isPending || registerMutation.isPending) ? <Loader2 className="w-5 h-5 animate-spin" /> : (flow === "login" ? "Sign In" : "Sign Up")}
               </button>
             </form>
           </div>
